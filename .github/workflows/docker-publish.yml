@@ -1,0 +1,48 @@
+name: Docker push
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+on:
+  push:
+    # Publish semver tags as releases.
+    tags: [ 'v*.*.*' ]
+  pull_request:
+    tags: [ 'v*.*.*' ]
+
+env:
+  # Use docker.io for Docker Hub if empty
+  REGISTRY: docker.io
+  # github.repository as <account>/<repo>
+  IMAGE_NAME: llm-rest
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Maximize build disk space
+        uses: easimon/maximize-build-space@v8
+        with:
+          root-reserve-mb: 40960
+          swap-size-mb: 8192
+          remove-dotnet: 'true'
+          remove-docker-images: 'true'
+          remove-codeql: 'true'
+          remove-haskell: 'true'
+          remove-android: 'true'
+      - name: Get git tag
+        uses: little-core-labs/get-git-tag@v3.0.2
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: docker login
+        env:
+          DOCKER_USER: ${{secrets.DOCKER_USER}}
+          DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+        run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+      - name: Build the docker image
+        run: docker build . --file Dockerfile --tag ${{secrets.DOCKER_USER}}/${{ env.IMAGE_NAME }}:$GIT_TAG_NAME
+      - name: Docker push
+        run: docker push ${{secrets.DOCKER_USER}}/${{ env.IMAGE_NAME }}:$GIT_TAG_NAME

@@ -1,0 +1,7 @@
+env
+db
+.git
+.idea
+.gitignore
+README.md
+test_main.http
