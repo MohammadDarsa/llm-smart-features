@@ -106,8 +106,7 @@ class ChatController:
     def __init__(self, llm_config):
         self.llm_config = llm_config
         self.router = APIRouter()
-        self.router.add_api_route("/chat", self.chat, methods=["POST"])
-        self.router.add_api_route("/smart_search", self.smart_search, methods=["POST"])
+        self.router.add_api_route("/chat", self.smart_search, methods=["POST"])
 
     async def chat(self, request: ChatRequest):
         _DEFAULT_TEMPLATE = """The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know.
@@ -138,18 +137,21 @@ class ChatController:
 
         # create a template
         _DEFAULT_TEMPLATE = """
-            Here's a list of products in json format. Only return the product ids that match the query the most. Multiple products can be returned.
+            Here's a list of products in json format. Only return the product ids that match the query the most.
+            Output example: id: 1, 3, 5;
+            Multiple products can be returned.
             
+            Here's the list of products in json format:
+
             {products_str}
-            
+
             Query: {query}
         """
-        prompt = PromptTemplate.from_template(template=_DEFAULT_TEMPLATE)
+        prompt = PromptTemplate(template=_DEFAULT_TEMPLATE, input_variables=["products_str", "query"])
         conversation = LLMChain(
             llm=self.llm_config.local_llm,
             prompt=prompt,
-            verbose=True,
-            memory=self.llm_config.memory
+            verbose=True
         )
 
         return {"message": conversation({"query": request.text, "products_str": products_str})}

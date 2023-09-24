@@ -16,7 +16,7 @@ class VectorDBConfig:
     def config(self):
         docs = self.load_docs()
         split_docs = self.split_docs(docs)
-        embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2", model_kwargs={"device": "cuda"},
+        embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2", model_kwargs={"device": "cpu"},
                                                    encode_kwargs={"batch_size": self.batch_size})
         return Chroma.from_documents(split_docs, embeddings, persist_directory="./db")
 
