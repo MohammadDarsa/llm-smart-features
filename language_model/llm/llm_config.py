@@ -1,9 +1,9 @@
+import torch
+from auto_gptq import AutoGPTQForCausalLM
 from langchain import HuggingFacePipeline
+from langchain.memory import VectorStoreRetrieverMemory
 from transformers import AutoTokenizer, BitsAndBytesConfig
 from transformers import pipeline
-from auto_gptq import AutoGPTQForCausalLM
-from langchain.memory import VectorStoreRetrieverMemory
-import torch
 
 
 class LlmConfig:
@@ -25,7 +25,6 @@ class LlmConfig:
             bnb_4bit_use_double_quant=True,
         )
 
-        tokenizer = AutoTokenizer.from_pretrained(self.model_name_or_path, use_fast=True)
         model = AutoGPTQForCausalLM.from_quantized(self.model_name_or_path,
                                                    model_basename=self.model_basename,
                                                    use_safetensors=True,
@@ -33,14 +32,17 @@ class LlmConfig:
                                                    device="cuda:0",
                                                    use_triton=False,
                                                    quantize_config=None)
+        tokenizer = AutoTokenizer.from_pretrained(self.model_name_or_path, use_fast=True)
         pipe = pipeline(
             "text-generation",
             model=model,
             tokenizer=tokenizer,
             max_new_tokens=512,
+            do_sample=True,
             temperature=0.7,
             top_p=0.95,
-            repetition_penalty=1.15
+            top_k=40,
+            repetition_penalty=1.1
         )
 
         self.local_llm = HuggingFacePipeline(pipeline=pipe)

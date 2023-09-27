@@ -1,7 +1,8 @@
 fastapi==0.85.1
 pandas==2.0.3
 bitsandbytes
-auto_gptq
+optimum>=1.12.0
+auto_gptq>=0.4.2
 einops
 accelerate
 openai
@@ -17,7 +18,7 @@ bs4
 unstructured
 libmagic
 torch
-transformers
+transformers>=4.32.0
 xformers
 chromadb==0.3.29
 sentence_transformers

@@ -6,101 +6,17 @@ from langchain import PromptTemplate, LLMChain
 from language_model.model.request.chat_request import ChatRequest
 
 
+def get_headers():
+    return "id  name  brand  price  screen  camera  battery  ram  storage  cpu  os"
+
+
 def get_products():
-    return {
-        "products": [
-            {
-                "id": "1",
-                "name": "Iphone 15 Pro Max",
-                "brand": "Apple",
-                "price": 1199,
-                "specs": {
-                    "screen": "6.7 inch",
-                    "camera": "48MP",
-                    "battery": "4422mAh",
-                    "ram": "8GB",
-                    "storage": "128GB",
-                    "cpu": "A17 Pro",
-                    "os": "iOS 17"
-                }
-            },
-            {
-                "id": "2",
-                "name": "Samsung Galaxy S23 Ultra",
-                "brand": "Samsung",
-                "price": 899,
-                "specs": {
-                    "screen": "6.8 inch",
-                    "camera": "200MP",
-                    "battery": "5000mAh",
-                    "ram": "12GB",
-                    "storage": "256GB",
-                    "cpu": "Snapdragon 8 Gen 2",
-                    "os": "Android 13"
-                }
-            },
-            {
-                "id": "3",
-                "name": "Google Pixel 7 Pro",
-                "brand": "Google",
-                "price": 699,
-                "specs": {
-                    "screen": "6.7 inch",
-                    "camera": "50MP",
-                    "battery": "5000mAh",
-                    "ram": "8GB",
-                    "storage": "128GB",
-                    "cpu": "Google Tensor G2",
-                    "os": "Android 13"
-                }
-            },
-            {
-                "id": "4",
-                "name": "OnePlus 11",
-                "brand": "OnePlus",
-                "price": 899,
-                "specs": {
-                    "screen": "6.7 inch",
-                    "camera": "50MP",
-                    "battery": "5000mAh",
-                    "ram": "8GB",
-                    "storage": "128GB",
-                    "cpu": "Snapdragon 8 Gen 2",
-                    "os": "Android 12"
-                }
-            },
-            {
-                "id": "5",
-                "name": "Iphone 15",
-                "brand": "Apple",
-                "price": 799,
-                "specs": {
-                    "screen": "6.1 inch",
-                    "camera": "48MP",
-                    "battery": "3349mAh",
-                    "ram": "6GB",
-                    "storage": "128GB",
-                    "cpu": "A16 bionic",
-                    "os": "iOS 17"
-                }
-            },
-            {
-                "id": "6",
-                "name": "Samsung Galaxy S23",
-                "brand": "Samsung",
-                "price": 699,
-                "specs": {
-                    "screen": "6.1 inch",
-                    "camera": "50MP",
-                    "battery": "3900mAh",
-                    "ram": "8GB",
-                    "storage": "128GB",
-                    "cpu": "Snapdragon 8 Gen 2",
-                    "os": "Android 13"
-                }
-            }
-        ]
-    }
+    return """1  Iphone 15 Pro Max  Apple  1199  6.7 inch  48MP  4422mAh  8GB  128GB  A17 Pro  iOS 17
+2  Samsung Galaxy S23 Ultra  Samsung  899  6.8 inch  200MP  5000mAh  12GB  256GB  Snapdragon 8 Gen 2  Android 13
+3  Google Pixel 7 Pro  Google  699  6.7 inch  50MP  5000mAh  8GB  128GB  Google Tensor G2  Android 13
+4  OnePlus 11  OnePlus  899  6.7 inch  50MP  5000mAh  8GB  128GB  Snapdragon 8 Gen 2  Android 12
+5  Iphone 15  Apple  799  6.1 inch  48MP  3349mAh  6GB  128GB  A16 bionic  iOS 17
+6  Samsung Galaxy S23  Samsung  699  6.1 inch  50MP  3900mAh  8GB  128GB  Snapdragon 8 Gen 2  Android 13"""
 
 
 class ChatController:
@@ -111,6 +27,7 @@ class ChatController:
 
     async def smart_search(self, request: ChatRequest):
         # get the products
+        headers = get_headers()
         products = get_products()
 
         # get products as a string using json
@@ -118,11 +35,18 @@ class ChatController:
 
         # create a template
         _DEFAULT_TEMPLATE = """
-            Here's a list of products in json format. Only return the product ids that match the query the most.
-            Output example: id: 1, 3, 5;
+            You're a shop keeper in an electronics store. A customer comes in and asks for a phone with the following specs, use the headers and products listed below to find the most suitable phone. The attributes in the headers and products are separated by 2 spaces:
+            The user will input a query and you should find the most suitable phone or phones.
+            The Output should look like this only conatining ids and nothing else: 
+            id: 1, 3, 5;
+            
             Multiple products can be returned.
             
-            Here's the list of products in json format:
+            Here's the header list:
+            
+            {headers}
+
+            Here's the product list, each attribute is separated by 2 spaces and is associated to its place in the headers:
 
             {products_str}
 
@@ -135,4 +59,4 @@ class ChatController:
             verbose=True
         )
 
-        return {"message": conversation({"query": request.text, "products_str": products_str})}
+        return {"message": conversation({"query": request.text, "products_str": products_str, "headers": headers})}
