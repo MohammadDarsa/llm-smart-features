@@ -1,15 +1,13 @@
-import torch
-from auto_gptq import AutoGPTQForCausalLM
 from langchain import HuggingFacePipeline
 from langchain.memory import VectorStoreRetrieverMemory
-from transformers import AutoTokenizer, BitsAndBytesConfig
+from transformers import AutoTokenizer, AutoModelForCausalLM
 from transformers import pipeline
 
 
 class LlmConfig:
 
     def __init__(self, vector_db_config):
-        self.model_name_or_path = "TheBloke/Dolphin-Llama-13B-GPTQ"
+        self.model_name_or_path = "TheBloke/Llama-2-70B-Ensemble-v5-GPTQ"
         self.model_basename = "model"
         self.local_llm = None
         self.memory = None
@@ -17,21 +15,10 @@ class LlmConfig:
         self.config()
 
     def config(self):
-        # go for a smaller model if you don't have the VRAM
-        quantization_config = BitsAndBytesConfig(
-            load_in_4bit=True,
-            bnb_4bit_compute_dtype=torch.float16,
-            bnb_4bit_quant_type="nf4",
-            bnb_4bit_use_double_quant=True,
-        )
-
-        model = AutoGPTQForCausalLM.from_quantized(self.model_name_or_path,
-                                                   model_basename=self.model_basename,
-                                                   use_safetensors=True,
-                                                   trust_remote_code=False,
-                                                   device="cuda:0",
-                                                   use_triton=False,
-                                                   quantize_config=None)
+        model = AutoModelForCausalLM.from_pretrained(self.model_name_or_path,
+                                                     device_map="auto",
+                                                     trust_remote_code=False,
+                                                     revision="main")
         tokenizer = AutoTokenizer.from_pretrained(self.model_name_or_path, use_fast=True)
         pipe = pipeline(
             "text-generation",
