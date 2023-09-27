@@ -6,17 +6,8 @@ from langchain import PromptTemplate, LLMChain
 from language_model.model.request.chat_request import ChatRequest
 
 
-def get_headers():
-    return "id  name  brand  price  screen  camera  battery  ram  storage  cpu  os"
-
-
 def get_products():
-    return """1  Iphone 15 Pro Max  Apple  1199  6.7 inch  48MP  4422mAh  8GB  128GB  A17 Pro  iOS 17
-2  Samsung Galaxy S23 Ultra  Samsung  899  6.8 inch  200MP  5000mAh  12GB  256GB  Snapdragon 8 Gen 2  Android 13
-3  Google Pixel 7 Pro  Google  699  6.7 inch  50MP  5000mAh  8GB  128GB  Google Tensor G2  Android 13
-4  OnePlus 11  OnePlus  899  6.7 inch  50MP  5000mAh  8GB  128GB  Snapdragon 8 Gen 2  Android 12
-5  Iphone 15  Apple  799  6.1 inch  48MP  3349mAh  6GB  128GB  A16 bionic  iOS 17
-6  Samsung Galaxy S23  Samsung  699  6.1 inch  50MP  3900mAh  8GB  128GB  Snapdragon 8 Gen 2  Android 13"""
+    return """id:1  name:Iphone 15 Pro Max  brand:Apple  price1199  ;  id:2  name:Samsung Galaxy S23 Ultra  brand:Samsung  price:899  ;  id:3  name:Google Pixel 7 Pro  brand:Google  price:699  ;  id:4  name:OnePlus 11  brand:OnePlus  price:899  ;  id:5  name:Iphone 15  brand:Apple  price:799  ;  id:6  name:Samsung Galaxy S23  brand:Samsung  price:699  ;"""
 
 
 class ChatController:
@@ -27,7 +18,6 @@ class ChatController:
 
     async def smart_search(self, request: ChatRequest):
         # get the products
-        headers = get_headers()
         products = get_products()
 
         # get products as a string using json
@@ -61,4 +51,4 @@ answer:"""
             verbose=True
         )
 
-        return {"message": conversation({"query": request.text, "products_str": products_str, "headers": headers})}
+        return {"message": conversation({"query": request.text, "products_str": products_str})}

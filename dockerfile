@@ -10,6 +10,7 @@ WORKDIR /app
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
+    && apt-get install -y vim \
     && apt-get install -y curl \
     && apt install -y software-properties-common \
     && add-apt-repository ppa:deadsnakes/ppa \
