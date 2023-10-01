@@ -35,10 +35,10 @@ The answer to the customer's query should only include the ids of the phones tha
 Examples of query-question:
 
 query: "google branded phones"
-answer: "3"
+answer: 3
 
 query: "Phones with more than 20MP camera:
-answer: "1,2,3"
+answer: 1,2,3
 
 Answer this query of the user:
 
