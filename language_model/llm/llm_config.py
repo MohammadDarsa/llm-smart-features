@@ -7,7 +7,7 @@ from transformers import pipeline
 class LlmConfig:
 
     def __init__(self, vector_db_config):
-        self.model_name_or_path = "TheBloke/Llama-2-70B-Ensemble-v5-GPTQ"
+        self.model_name_or_path = "TheBloke/fiction.live-Kimiko-V2-70B-fp16"
         self.model_basename = "model"
         self.local_llm = None
         self.memory = None
